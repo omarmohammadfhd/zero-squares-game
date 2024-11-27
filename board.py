@@ -1,8 +1,10 @@
 import copy
 from puzzle import puzzle
+from uniform_cost_search_algorithm import  ucs
 from recursive_dfs import re_dfs
 from dfs_and_bfs_algorithm import bfs,dfs
 def prepare_bfs_inputs(game):
+    import copy
     graph = {}
     start_positions = game.positions
     goals = []
@@ -13,21 +15,27 @@ def prepare_bfs_inputs(game):
             cup = game.puzzle[i][j]
             if cup.goal == 1:
                 goals.append((i, j))
+
+
     queue = [(copy.deepcopy(game), tuple(game.positions))]
     visited_states = set()
+
     while queue:
         current_game, current_positions = queue.pop(0)
         if current_positions in visited_states:
             continue
         visited_states.add(current_positions)
+
+
         possible_moves = current_game.next_state()
         graph[current_positions] = []
 
-        for cube_color, direction, new_position in possible_moves:
+
+        for cube_color, direction, new_position, cost in possible_moves:
             new_game = current_game.move(direction)
             new_positions = tuple(new_game.positions)
             if new_positions not in visited_states:
-                graph[current_positions].append(new_positions)
+                graph[current_positions].append((new_positions, cost))
                 queue.append((new_game, new_positions))
 
     return graph, tuple(start_positions), goals
@@ -204,7 +212,6 @@ class PuzzleGame:
 
         return new_puzzle
 
-
     def next_state(self):
         possible_moves = []
 
@@ -214,42 +221,40 @@ class PuzzleGame:
 
             def continue_in_direction(dx, dy):
                 new_x, new_y = x, y
+                steps = 0
                 while 0 <= new_x + dx < len(self.puzzle) and 0 <= new_y + dy < len(self.puzzle[0]):
                     new_x += dx
                     new_y += dy
-
+                    steps += 1
 
                     if self.puzzle[new_x][new_y].color == 'black':
                         new_x -= dx
                         new_y -= dy
+                        steps -= 1
                         break
-
 
                     if self.puzzle[new_x][new_y].goal and self.puzzle[new_x][new_y].color != self.puzzle[x][y].color:
                         continue
 
-                return new_x, new_y
+                return new_x, new_y, steps
 
             if self.check_right():
-                final_x, final_y = continue_in_direction(0, 1)
-                possible_moves.append((cube_color, "right", (final_x, final_y)))
+                final_x, final_y, cost = continue_in_direction(0, 1)
+                possible_moves.append((cube_color, "right", (final_x, final_y), cost))
 
             if self.check_left():
-                final_x, final_y = continue_in_direction(0, -1)
-                possible_moves.append((cube_color, "left", (final_x, final_y)))
+                final_x, final_y, cost = continue_in_direction(0, -1)
+                possible_moves.append((cube_color, "left", (final_x, final_y), cost))
 
             if self.check_up():
-                final_x, final_y = continue_in_direction(-1, 0)
-                possible_moves.append((cube_color, "up", (final_x, final_y)))
+                final_x, final_y, cost = continue_in_direction(-1, 0)
+                possible_moves.append((cube_color, "up", (final_x, final_y), cost))
 
             if self.check_down():
-                final_x, final_y = continue_in_direction(1, 0)
-                possible_moves.append((cube_color, "down", (final_x, final_y)))
+                final_x, final_y, cost = continue_in_direction(1, 0)
+                possible_moves.append((cube_color, "down", (final_x, final_y), cost))
 
         return possible_moves
-
-
-
 
 
 game = PuzzleGame(puzzle)
@@ -285,10 +290,13 @@ game.print_puzzle()
 #
 
 graph, start, goals = prepare_bfs_inputs(game)
-visited = re_dfs(graph, start, visited=None)
 # path, visited = bfs(graph, start, goals)
 # path,visited = dfs(graph, start, goals)
+# visited = re_dfs(graph, start, visited=None)
+solution = ucs(graph,start,goals)
+
+print('solution is ' , solution)
 # print(path)
 
-print(visited)
+# print(visited)
 # print(len(visited))
