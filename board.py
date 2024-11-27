@@ -1,5 +1,6 @@
 import copy
 from puzzle import puzzle
+from recursive_dfs import re_dfs
 from dfs_and_bfs_algorithm import bfs,dfs
 def prepare_bfs_inputs(game):
     graph = {}
@@ -278,16 +279,16 @@ game = PuzzleGame(puzzle)
 #
 game.print_puzzle()
 
-possible_moves = game.next_state()
-print(possible_moves)
+# possible_moves = game.next_state()
+# print(possible_moves)
 # # print("Can move right:", game.check_right())
 #
 
 graph, start, goals = prepare_bfs_inputs(game)
-
-path, visited = bfs(graph, start, goals)
+visited = re_dfs(graph, start, visited=None)
+# path, visited = bfs(graph, start, goals)
 # path,visited = dfs(graph, start, goals)
-print(path)
+# print(path)
 
 print(visited)
-print(len(visited))
+# print(len(visited))
