@@ -1,4 +1,7 @@
 import copy
+
+from Tools.demo.sortvisu import steps
+
 from puzzle import puzzle
 from uniform_cost_search_algorithm import  ucs
 from recursive_dfs import re_dfs
@@ -254,7 +257,7 @@ class PuzzleGame:
                 final_x, final_y, cost = continue_in_direction(1, 0)
                 possible_moves.append((cube_color, "down", (final_x, final_y), cost))
 
-        return possible_moves
+        return possible_moves ,steps
 
 
 game = PuzzleGame(puzzle)
