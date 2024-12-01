@@ -1,3 +1,4 @@
+from Tools.demo.sortvisu import steps
 
 
 def path_cost(path):
@@ -7,7 +8,7 @@ def path_cost(path):
     return total_cost , path[-1][0]
 
 def path_f_const(path):
-    H_table = []
+    H_table = [steps]
     g_cost= 0
     for (node,cost)in path:
         g_cost += cost
