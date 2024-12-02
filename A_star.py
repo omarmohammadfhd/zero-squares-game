@@ -1,18 +1,16 @@
-
-
-
-
-def heuristic(state, goals):
+def manhattan_heuristic(start_positions, goal_positions):
     total_distance = 0
-
-    for pos in state:
+    for start in start_positions:
         min_distance = float('inf')
-        for goal in goals:
-            distance = abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
-            min_distance = min(min_distance, distance)
+        for goal in goal_positions:
+            if isinstance(start, tuple) and isinstance(goal, tuple):
+                distance = abs(start[0] - goal[0]) + abs(start[1] - goal[1])
+                min_distance = min(min_distance, distance)
+            else:
+                raise ValueError("Expected tuple for start and goal positions")
         total_distance += min_distance
-
     return total_distance
+
 
 
 def path_f_const(path , total_distance):
@@ -40,22 +38,28 @@ def path_f_const(path , total_distance):
 #     return f_cost, last_node
 
 
-def a_star(graph , start , goal):
-    visited  =[]
-    queue = [[(start,0)]]
-    while queue :
-        queue.sort(key=heuristic(start, goal))
+def a_star(graph, start_positions, goals):
+    visited = set()
+    queue = [[(start, 0)] for start in start_positions]
+
+    while queue:
+        queue.sort(key=lambda path: sum(node[1] for node in path) + manhattan_heuristic([path[-1][0]], goals))
         path = queue.pop(0)
         node = path[-1][0]
-        if node in visited :
+
+        if node in visited:
             continue
-        visited.append(node)
-        if node == goal:
+
+        visited.add(node)
+
+        if node in goals:
             return path
-        else:
-            adjacent_nodes = graph.get(node,[])
-            for (node2 ,cost )in adjacent_nodes:
-                new_path =path.copy()
-                new_path.append((node2,cost))
-                queue.append(new_path)
-        return visited
+
+        adjacent_nodes = graph.get(node, [])
+
+        for (node2, cost) in adjacent_nodes:
+            new_path = path.copy()
+            new_path.append((node2, cost))
+            queue.append(new_path)
+
+    return visited

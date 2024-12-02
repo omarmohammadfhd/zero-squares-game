@@ -7,15 +7,14 @@ def path_cost(path):
         total_cost += cost
     return total_cost , path[-1][0]
 
-def path_f_const(path):
-    H_table = [steps]
-    g_cost= 0
-    for (node,cost)in path:
-        g_cost += cost
-        last_node= path[-1][0]
-        h_cost = H_table[last_node]
-        f_cost = g_cost + h_cost
-        return f_cost , last_node
+# def path_f_const(path):
+#     g_cost= 0
+#     for (node,cost)in path:
+#         g_cost += cost
+#         last_node= path[-1][0]
+#         h_cost = H_table[last_node]
+#         f_cost = g_cost + h_cost
+#         return f_cost , last_node
 
 
 def ucs(graph , start , goal):

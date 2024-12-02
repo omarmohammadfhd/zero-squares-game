@@ -1,47 +1,24 @@
 import copy
 
-from Tools.demo.sortvisu import steps
-
+from A_star import heuristic, a_star, path_f_const
 from puzzle import puzzle
 from uniform_cost_search_algorithm import  ucs
 from recursive_dfs import re_dfs
 from dfs_and_bfs_algorithm import bfs,dfs
 def prepare_bfs_inputs(game):
-    import copy
-    graph = {}
+    # المواقع الابتدائية
     start_positions = game.positions
+
+    # البحث عن الأهداف
     goals = []
-
-
     for i in range(len(game.puzzle)):
         for j in range(len(game.puzzle[i])):
             cup = game.puzzle[i][j]
-            if cup.goal == 1:
+            if cup.goal == 1:  # التحقق إذا كان الهدف موجودًا
                 goals.append((i, j))
 
+    return start_positions, goals
 
-    queue = [(copy.deepcopy(game), tuple(game.positions))]
-    visited_states = set()
-
-    while queue:
-        current_game, current_positions = queue.pop(0)
-        if current_positions in visited_states:
-            continue
-        visited_states.add(current_positions)
-
-
-        possible_moves = current_game.next_state()
-        graph[current_positions] = []
-
-
-        for cube_color, direction, new_position, cost in possible_moves:
-            new_game = current_game.move(direction)
-            new_positions = tuple(new_game.positions)
-            if new_positions not in visited_states:
-                graph[current_positions].append((new_positions, cost))
-                queue.append((new_game, new_positions))
-
-    return graph, tuple(start_positions), goals
 
 class PuzzleGame:
     def __init__(self, puzzle):
@@ -216,10 +193,10 @@ class PuzzleGame:
         return new_puzzle
 
     def next_state(self):
-        possible_moves = []
+        possible_moves = {}
 
         for x, y in self.positions:
-
+            key = (x, y)
             cube_color = self.puzzle[x][y].color
 
             def continue_in_direction(dx, dy):
@@ -241,23 +218,25 @@ class PuzzleGame:
 
                 return new_x, new_y, steps
 
+            possible_moves[key] = []
+
             if self.check_right():
                 final_x, final_y, cost = continue_in_direction(0, 1)
-                possible_moves.append((cube_color, "right", (final_x, final_y), cost))
+                possible_moves[key].append(((final_x, final_y), cost))
 
             if self.check_left():
                 final_x, final_y, cost = continue_in_direction(0, -1)
-                possible_moves.append((cube_color, "left", (final_x, final_y), cost))
+                possible_moves[key].append(((final_x, final_y), cost))
 
             if self.check_up():
                 final_x, final_y, cost = continue_in_direction(-1, 0)
-                possible_moves.append((cube_color, "up", (final_x, final_y), cost))
+                possible_moves[key].append(((final_x, final_y), cost))
 
             if self.check_down():
                 final_x, final_y, cost = continue_in_direction(1, 0)
-                possible_moves.append((cube_color, "down", (final_x, final_y), cost))
+                possible_moves[key].append(((final_x, final_y), cost))
 
-        return possible_moves ,steps
+        return possible_moves
 
 
 game = PuzzleGame(puzzle)
@@ -287,19 +266,24 @@ game = PuzzleGame(puzzle)
 #
 game.print_puzzle()
 
-# possible_moves = game.next_state()
-# print(possible_moves)
+possible_moves = game.next_state()
+print(possible_moves)
 # # print("Can move right:", game.check_right())
 #
 
-graph, start, goals = prepare_bfs_inputs(game)
+start, goals = prepare_bfs_inputs(game)
 # path, visited = bfs(graph, start, goals)
 # path,visited = dfs(graph, start, goals)
 # visited = re_dfs(graph, start, visited=None)
-solution = ucs(graph,start,goals)
+# solution = ucs(graph,start,goals)
+# H_table = heuristic(start,goals )
+# a_star_test = a_star(graph, start, goals,heuristic)
+# f_cost, last_node= path_f_const(path, H_table)
+# print('solution is ' , solution)
+print(start)
+print(goals)
 
-print('solution is ' , solution)
-# print(path)
+# print(a_star_test)
 
-# print(visited)
+# print(H_table)
 # print(len(visited))
